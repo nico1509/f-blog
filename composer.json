@@ -1,0 +1,16 @@
+{
+    "name": "nico1509/facebook-blog",
+    "description": "An Import Plugin for your Facebook Page",
+    "type": "project",
+    "require-dev": {
+        "phpunit/phpunit": "^9.2"
+    },
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Nico Aßfalg",
+            "email": "homepage@nico-assfalg.de"
+        }
+    ],
+    "require": {}
+}
