@@ -12,5 +12,10 @@
             "email": "homepage@nico-assfalg.de"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Nico1509\\Facebookblog\\": "src/"
+        }
+    }
 }
