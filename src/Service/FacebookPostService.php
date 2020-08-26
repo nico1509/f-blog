@@ -35,11 +35,11 @@ class FacebookPostService {
 
     private function addAttachement(FacebookPost $facebookPost, array $postData): void
     {
-        if (!isset($postData['attachements'])) {
+        if (!isset($postData['attachments'])) {
             return;
         }
         // Annahme: Nur ein Anhang pro Post
-        $attachementData = $postData['attachements']['data'][0];
+        $attachementData = $postData['attachments']['data'][0];
         switch ($attachementData['type']) {
             case 'photo':
                 $this->addPhotoAttachement($facebookPost, $attachementData);
