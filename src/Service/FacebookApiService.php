@@ -5,6 +5,7 @@ namespace Nico1509\Facebookblog\Service;
 
 
 use \DateTime;
+use Exception;
 use Nico1509\Facebookblog\Model\Log;
 use \RuntimeException;
 
@@ -12,8 +13,10 @@ class FacebookApiService {
 
     private const API_BASE = 'https://graph.facebook.com/v7.0';
     private const API_FEED = '/%s/feed';
-    private const API_POST_DETAILS = '/%s?fields=created_time,message,attachements';
+    private const API_POST_DETAILS = '/%s?fields=created_time,message,attachments';
     private const API_AUTH = 'access_token=%s';
+
+    private const EXT_JSON = '.json';
 
     private Log $log;
     private string $accessToken;
@@ -32,13 +35,14 @@ class FacebookApiService {
      * @param DateTime|null $since
      *
      * @return void
+     * @throws Exception
      */
     public function fetchFeed( string $pageId, ?DateTime $since = null ): void {
         $feedUrl  = $this->getFeedUrl( $pageId );
         $feedJson = $this->fetchApiData( $feedUrl );
         $this->saveJsonFile( $feedJson, 'feed' );
 
-        $feedData = json_decode( $feedJson );
+        $feedData = json_decode( $feedJson, true );
         if ( ! isset( $feedData['data'] ) ) {
             throw new RuntimeException( 'Ungültige Feed-Daten für Page ID "' . $pageId . '"' );
         }
@@ -60,6 +64,11 @@ class FacebookApiService {
 
     private function getFeedUrl( string $pageId ): string {
         return self::API_BASE . sprintf( self::API_FEED, $pageId )
+               . '?' . sprintf( self::API_AUTH, $this->accessToken );
+    }
+
+    private function getPostDetailsUrl( string $postId ): string {
+        return self::API_BASE . sprintf( self::API_POST_DETAILS, $postId )
                . '&' . sprintf( self::API_AUTH, $this->accessToken );
     }
 
@@ -70,13 +79,8 @@ class FacebookApiService {
     }
 
     private function saveJsonFile( string $content, string $fileName ): void {
-        $filePath = $this->log->getDataDir() . DIRECTORY_SEPARATOR . $fileName;
+        $filePath = $this->log->getDataDir() . DIRECTORY_SEPARATOR . $fileName . self::EXT_JSON;
         file_put_contents( $filePath, $content );
-    }
-
-    private function getPostDetailsUrl( string $postId ): string {
-        return self::API_BASE . sprintf( self::API_POST_DETAILS, $postId )
-               . '&' . sprintf( self::API_AUTH, $this->accessToken );
     }
 
 }
