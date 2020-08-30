@@ -8,9 +8,11 @@ Version: 1.0
 Author URI: https://nico-assfalg.de
 */
 
+use Nico1509\Facebookblog\Admin\WordpressSettings;
+
 function_exists('add_action') or die('Not a Wordpress Env');
 
-//require __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
+require __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 
 if ( ! class_exists( 'FacebookBlog' ) ) {
 
@@ -29,8 +31,8 @@ if ( ! class_exists( 'FacebookBlog' ) ) {
         function register()
         {
             add_action( 'admin_menu', [ $this, 'add_admin_pages' ] );
-            add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), [ $this, 'settings_link' ] );
-            add_action( 'admin_init', [ $this, 'register_setting_fields' ] );
+            add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), [ $this, 'add_settings_link' ] );
+            $this->add_settings();
         }
 
         public function add_admin_pages()
@@ -51,45 +53,24 @@ if ( ! class_exists( 'FacebookBlog' ) ) {
             require_once plugin_dir_path( __FILE__ ) . 'templates/admin.php';
         }
 
-        public function settings_link( $links )
+        public function add_settings_link( $links )
         {
             $settingsLink = '<a href="admin.php?page=facebook_blog">Einstellungen</a>';
             array_push( $links, $settingsLink );
             return $links;
         }
 
-        public function register_setting_fields()
+        public function add_settings()
         {
-            register_setting(
-                'facebook_blog_settings',
-                'facebook_blog_page_token',
-                [ $this, 'test_example_callback' ]
-            );
-
-            add_settings_section(
-                'facebook_blog_admin_index',
-                'Settings',
-                function () {
-                    echo 'SSSECTION';
-                },
-                'facebook_blog'
-            );
-
-            add_settings_field(
-                'facebook_blog_page_token',
-                'Facebook Page Token',
-                function () {
-                    echo '<input type="text" class="regular-text" name="facebook_blog_page_token" value="' . esc_attr( get_option( 'facebook_blog_page_token' ) ) . '" placeholder="Input here...">';
-                },
-                'facebook_blog',
-                'facebook_blog_admin_index',
-                [ 'label_for' => 'facebook_blog_page_token' ]
-            );
-        }
-
-        public function test_example_callback( $input )
-        {
-            return $input;
+            $wordpressSettings = new WordpressSettings( [
+                [
+                    'title'             => 'Facebook Page Token',
+                    'option_name'       => 'facebook_blog_page_token',
+                    'option_group'      => 'facebook_blog_settings',
+                    'sanitize_callback' => function ( $input ) { return $input; },
+                ],
+            ] );
+            add_action( 'admin_init', [ $wordpressSettings, 'register' ] );
         }
     }
 }
