@@ -69,10 +69,16 @@ class FacebookPostService {
         $facebookPost->setImageSource($attachementData['media']['image']['src']);
         $facebookPost->setVideoSource($attachementData['media']['source']);
         $facebookPost->setVideoLink($attachementData['target']['url']);
+        $message = $facebookPost->getMessage();
+        $message = '<span class="dashicons dashicons-external"></span> <a target="_blank" href="' . $attachementData['url'] . '">Video auf Facebook</a><br>' . $message;
+        $facebookPost->setMessage($message);
     }
 
     private function addLinkAttachement(FacebookPost $facebookPost, array $attachementData): void
     {
         $facebookPost->setLink($attachementData['url']);
+        $message = $facebookPost->getMessage();
+        $message = '<span class="dashicons dashicons-external"></span> <a target="_blank" href="' . $attachementData['url'] . '">&bdquo;' . $attachementData['title'] . '&ldquo;</a><br>' . $message;
+        $facebookPost->setMessage($message);
     }
 }
