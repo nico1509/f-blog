@@ -58,7 +58,7 @@ class WordpressPostService {
         wp_update_attachment_metadata($attachmentId, $attachmentData);
         $postThumbnailSuccess = set_post_thumbnail($postId, $attachmentId);
         if ( ! $postThumbnailSuccess ) {
-            $this->log->addError( 'Fehler beim setzen des Thumbnails: "' . $postThumbnailSuccess . '". Beitrag "' . $postId . '", Attachment "' . $attachmentId . '"' );
+            $this->log->addError( 'Fehler beim setzen des Thumbnails: Beitrag "' . $postId . '", Attachment "' . $attachmentId . '"' );
         }
     }
 

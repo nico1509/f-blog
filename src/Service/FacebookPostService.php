@@ -53,7 +53,7 @@ class FacebookPostService {
                 $this->addLinkAttachement($facebookPost, $attachementData);
                 break;
             default:
-                $this->log->addError('Unbekannter Attachment-Typ: "' . $attachementData['type'] . '"');
+                $this->log->addError('Unbekannter Attachment-Typ: "' . $attachementData['type'] . '" in Post "' . $facebookPost->getId() . '"');
                 break;
         }
     }

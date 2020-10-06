@@ -93,6 +93,15 @@ class ImportTask
     {
         if ( ! empty( $log->getErrors() ) ) {
             error_log( 'Facebook-Blog Import Error: ' . implode( ' + ', $log->getErrors() ) );
+            $this->send_email_notifications( $log );
+        }
+    }
+
+    private function send_email_notifications( Log $log )
+    {
+        $email_list = get_option( 'facebook_blog_notification_emails' );
+        foreach ( explode( ';', $email_list ) as $email ) {
+            wp_mail( $email, 'Wordpress Facebook-Blog Fehler', implode( ' + ', $log->getErrors() ) );
         }
     }
 }
