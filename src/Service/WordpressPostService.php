@@ -19,7 +19,7 @@ class WordpressPostService {
     }
 
     /**
-     * Erstellt aus dem Post-Objekt einen Wordpress-Blogeintrag
+     * Erstellt aus einem {@see FacebookPost}-Objekt einen Wordpress-Blogeintrag
      *
      * @param FacebookPost $post
      *
@@ -48,12 +48,21 @@ class WordpressPostService {
 
     private function attachImage( int $postId, string $imageUrl ): void
     {
-        $downloadedImagePath = $this->downloadImage($imageUrl);
-        $attachmentId = wp_insert_attachment([], $downloadedImagePath);
-        set_post_thumbnail($postId, $attachmentId);
+        $downloadedImagePath = $this->downloadImage($postId, $imageUrl);
+        $attachmentId = wp_insert_attachment([
+            'post_mime_type' => 'image/png',
+            'post_title' => basename( $downloadedImagePath ),
+            'post_status' => 'inherit',
+        ], $downloadedImagePath, $postId);
+        $attachmentData = wp_generate_attachment_metadata($attachmentId, $downloadedImagePath);
+        wp_update_attachment_metadata($attachmentId, $attachmentData);
+        $postThumbnailSuccess = set_post_thumbnail($postId, $attachmentId);
+        if ( ! $postThumbnailSuccess ) {
+            $this->log->addError( 'Fehler beim setzen des Thumbnails: "' . $postThumbnailSuccess . '". Beitrag "' . $postId . '", Attachment "' . $attachmentId . '"' );
+        }
     }
 
-    private function downloadImage( string $imageUrl ): string
+    private function downloadImage( string $postId, string $imageUrl ): string
     {
         $tempFile = download_url($imageUrl, 5);
         if (is_wp_error($tempFile)) {
@@ -61,8 +70,8 @@ class WordpressPostService {
         }
 
         $file = [
-            'name' => basename($imageUrl),
-            'type' => mime_content_type($tempFile),
+            'name' => $postId . '.png',
+            'type' => 'image/png',
             'tmp_name' => $tempFile,
             'error' => 0,
             'size' => filesize($tempFile),
@@ -73,11 +82,17 @@ class WordpressPostService {
             'test_form' => false,
             // Keine leere Datei erlauben
             'test_size' => true,
+            // MIME-Types für Bilder erlauben
+            'mimes' => [
+                'jpg|jpeg|jpe'  => 'image/jpeg',
+                'gif'           => 'image/gif',
+                'png'           => 'image/png',
+            ],
         ];
 
         $uploadResult = wp_handle_sideload($file, $uploadOptions);
         if (!empty($uploadResult['error'])) {
-            throw new RuntimeException('Fehler bei Überprüfung von heruntergeladenem Bild "' . $imageUrl . '"');
+            throw new RuntimeException('Fehler bei Überprüfung von heruntergeladenem Bild "' . $imageUrl . '": ' . $uploadResult['error'] );
         }
 
         return $uploadResult['file'];

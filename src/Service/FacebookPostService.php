@@ -16,7 +16,7 @@ class FacebookPostService {
     }
 
     /**
-     * Validiert die Feed-Daten und erstellt eine {@see FacebookPost}-Liste
+     * Erstellt aus den JSON Feed-Daten und eine {@see FacebookPost}-Liste
      *
      * @param array $feedData
      *
@@ -44,14 +44,16 @@ class FacebookPostService {
             case 'photo':
                 $this->addPhotoAttachement($facebookPost, $attachementData);
                 break;
+            case 'video':
             case 'video_autoplay':
+            case 'video_inline':
                 $this->addVideoAttachement($facebookPost, $attachementData);
                 break;
             case 'share':
                 $this->addLinkAttachement($facebookPost, $attachementData);
                 break;
             default:
-                // TODO: Log "unbekannter Attachement Typ"
+                $this->log->addError('Unbekannter Attachment-Typ: "' . $attachementData['type'] . '"');
                 break;
         }
     }
