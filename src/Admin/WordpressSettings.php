@@ -27,7 +27,10 @@ class WordpressSettings {
 
     private function register_setting_fields( array $setting )
     {
-        register_setting( $setting['option_group'], $setting['option_name'], $setting['sanitize_callback'] );
+        register_setting( $setting['option_group'], $setting['option_name'], [
+            'sanitize_callback' => $setting['sanitize_callback'],
+            'type' => $setting['type'],
+        ] );
         add_settings_field( $setting['option_name'], $setting['title'], $this->get_callback_input_text($setting['option_name']), self::PAGE_SLUG, self::PAGE_SECTION_ID );
     }
 
