@@ -50,8 +50,9 @@ class FacebookApiServiceTest extends TestCase {
 
     public function testFetchFeed(): void
     {
-        $this->facebookApiService->fetchFeed('12345', null);
+        $feedBaseName = $this->facebookApiService->fetchFeed('12345', null);
 
-        self::assertFileExists($this->tempDir . '/100325135089197_100868891701488.json');
+        self::assertFileExists($feedBaseName . '.json');
+        self::assertFileExists($feedBaseName . '/100325135089197_100868891701488.json');
     }
 }

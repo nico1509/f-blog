@@ -28,23 +28,27 @@ class FacebookApiService {
 
     /**
      * Lädt den Feed als JSON-Datei in das data-Verzeichnis
-     * und gibt Dateipfad und Inhalt in einem PHP-Array zurück
+     * und gibt den Dateipfad zurück
      *
      * @param string $pageId
      *
      * @param DateTime|null $since
      *
-     * @return void
+     * @return string
      * @throws Exception
      */
-    public function fetchFeed( string $pageId, ?DateTime $since = null ): void {
+    public function fetchFeed( string $pageId, ?DateTime $since = null ): string {
         $feedUrl  = $this->getFeedUrl( $pageId );
         $feedJson = $this->fetchApiData( $feedUrl );
-        $this->saveJsonFile( $feedJson, 'feed' );
+
+        $now = new DateTime();
+        $feedBaseName = 'feed_' . $now->format('Y-m-d_H-i-s');
+        $this->saveJsonFile( $feedJson, $feedBaseName );
+        mkdir( $this->log->getDataDir() . DIRECTORY_SEPARATOR . $feedBaseName );
 
         $feedData = json_decode( $feedJson, true );
         if ( ! isset( $feedData['data'] ) ) {
-            throw new RuntimeException( 'Ungültige Feed-Daten für Page ID "' . $pageId . '"' );
+            throw new RuntimeException( 'Ungültige Feed-Daten für Page ID "' . $pageId . '", URL: "' . $feedUrl . '"' );
         }
         foreach ( $feedData['data'] as $postData ) {
             $postId         = $postData['id'];
@@ -52,14 +56,16 @@ class FacebookApiService {
 
             if ( $since !== null ) {
                 $postDateTime = new DateTime( $postData['created_time'] );
-                if ( $postDateTime->getTimestamp() < $since->getTimestamp() ) {
+                if ( $postDateTime->getTimestamp() <= $since->getTimestamp() ) {
                     continue;
                 }
             }
 
             $postDetailsJson = $this->fetchApiData( $postDetailsUrl );
-            $this->saveJsonFile( $postDetailsJson, $postData['id'] );
+            $this->saveJsonFile( $postDetailsJson, $postData['id'], $feedBaseName );
         }
+
+        return $this->log->getDataDir() . DIRECTORY_SEPARATOR . $feedBaseName;
     }
 
     private function getFeedUrl( string $pageId ): string {
@@ -78,8 +84,12 @@ class FacebookApiService {
         return wp_remote_retrieve_body( $response );
     }
 
-    private function saveJsonFile( string $content, string $fileName ): void {
-        $filePath = $this->log->getDataDir() . DIRECTORY_SEPARATOR . $fileName . self::EXT_JSON;
+    private function saveJsonFile( string $content, string $fileName, string $subDir = '' ): void {
+        $dir = $this->log->getDataDir();
+        if ($subDir !== '') {
+            $dir .= DIRECTORY_SEPARATOR . $subDir;
+        }
+        $filePath = $dir . DIRECTORY_SEPARATOR . $fileName . self::EXT_JSON;
         file_put_contents( $filePath, $content );
     }
 
