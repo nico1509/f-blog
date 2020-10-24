@@ -5,7 +5,7 @@ namespace Nico1509\Facebookblog\Service;
 
 // Mock, um Test stabil zu halten
 function download_url( $url, $timeout = 300, $signature_verification = false ) {
-    $mockImagePath = __DIR__ . '/../Fixture/dr-logo.png';
+    $mockImagePath = __DIR__ . '/../Fixture/test-logo.png';
     $tempDir = sys_get_temp_dir() . '/facebookblog-integration-wppost';
     exec("cp -p '$mockImagePath' '$tempDir'");
     return $tempDir . '/' . basename($mockImagePath);
@@ -49,7 +49,7 @@ class WordpressPostServiceTest extends TestCase {
             'Some Facebook Post',
             '12345_53242134',
             new DateTime( '2020-08-01 00:00:00' ),
-            'https://some-url.dev/dr-logo.png'
+            'https://some-url.dev/test-logo.png'
         );
 
         $id = $this->wordpressPostService->createBlogPost($facebookPost);
