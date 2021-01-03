@@ -8,7 +8,7 @@ Then you can configure your Page-ID and Token in the menu. See http://developer.
 
 ## Cron
 
-The plugin will register a job in wp-cron which runs every night. This behaviour is currently hard-coded.
+The plugin will register a job in wp-cron which runs daily. This behaviour is currently hard-coded.
 
 ## About
 
