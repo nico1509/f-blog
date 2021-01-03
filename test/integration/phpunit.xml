@@ -8,7 +8,7 @@
 	convertWarningsToExceptions="true"
 	>
 	<testsuites>
-		<testsuite name="facebook-blog-integration-tests">
+		<testsuite name="f-blog-integration-tests">
 			<directory suffix="Test.php">.</directory>
 		</testsuite>
 	</testsuites>
