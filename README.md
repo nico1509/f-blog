@@ -3,7 +3,8 @@ A simple WordPress plugin to import your Facebook page feed into your blog
 
 ## Setup
 
-Copy the plugin into your WordPress Plugin directory and enable it in the Admin Dashboard.
+Do a `composer install` to [generate the autoloader](https://getcomposer.org/doc/01-basic-usage.md#autoloading), 
+then copy the plugin into your WordPress Plugin directory and enable it in the Admin Dashboard.
 Then you can configure your Page-ID and Token in the menu. See http://developer.facebook.com/ for more information.
 
 ## Cron
